@@ -2,24 +2,6 @@
 @author: Micah Galizia <micahgalizia@gmail.com>
 
 This class provides the helper calls to view the MLS Live streams.
-
-
-OK, GOOD NEWS CHECK THIS:
-
-http://mls.cdnak.neulion.com/mobile/feeds/game/2011/429874_iphone.xml
-
-which lead to
-
-http://feeds.cdnak.neulion.com/fs/mls/mobile/iphone/video/philadelphiaunion/ipad.m3u8
-
-
-AND
-
-http://mls.cdnak.neulion.com/mobile/feeds/game/2011/429874_ced.xml
-
-which leads to
-
-http://feeds.cdnak.neulion.com/fs/mls/mobile/iphone/video/philadelphiaunion/ced.m3u8
 """
 
 import string, urllib, urllib2, xml.dom.minidom
