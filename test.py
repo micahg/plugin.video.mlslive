@@ -14,7 +14,10 @@ if len(sys.argv) == 2:
         print k + ": " + streams[k]
     sys.exit(0)
 
-my_mls.login('', '')
+if not my_mls.login('', ''):
+    print "Unable to authenticte with MLS live. please set username and password."
+    sys.exit(1)
+    
 games = my_mls.getGames()
 
 for game in games:
