@@ -4,8 +4,9 @@
 This class provides the helper calls to view the MLS Live streams.
 """
 
-import string, urllib, urllib2, xml.dom.minidom
-from datetime import datetime
+import string, urllib, urllib2, time, xml.dom.minidom
+#import datetime
+#from datetime import datetime
 
 class MLSGame:
     
@@ -89,7 +90,7 @@ class MLSLive:
         # the current date (according to the response)
         cur_date_node = result_node.getElementsByTagName('currentDate')[0]
         cur_date = cur_date_node.firstChild.nodeValue
-        current_date = datetime.strptime(cur_date, "%a %b %d %H:%M:%S %Z %Y")
+        current_date = time.strptime(cur_date, "%a %b %d %H:%M:%S %Z %Y")
         
         games = []
 
@@ -99,10 +100,12 @@ class MLSLive:
             
             # get the date/time for the game
             time_str = game.getElementsByTagName('gameTime')[0].firstChild.nodeValue
-            game_date = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S.0")
+            game_date = time.strptime(time_str, "%Y-%m-%d %H:%M:%S.0")
             
             # skip games not from today
-            if game_date.date() != current_date.date():
+            game_date_str = time.strftime("%Y%m%d", game_date)
+            curr_date_str = time.strftime("%Y%m%d", current_date)
+            if not game_date_str == curr_date_str:
                 continue
             
             # get the id, home and away team abreviations 

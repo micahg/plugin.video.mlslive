@@ -1,4 +1,4 @@
-import xbmcplugin, xbmcgui, xbmcaddon, mlslive
+import xbmcplugin, xbmcgui, xbmcaddon, mlslive, urllib, time, re
 
 __settings__ = xbmcaddon.Addon(id='plugin.video.mlslive')
 __language__ = __settings__.getLocalizedString
@@ -36,15 +36,16 @@ def createMainMenu():
                                   succeeded=False)
 
     for game in my_mls.getGames():
-        game_str = game.game_id + ": " + game.time.strftime("%H:%M") + " "+ \
-                   game.away + " at " + game.home
+        game_url = sys.argv[0] + "?id=" + urllib.quote_plus(game.game_id)
+        game_str = game.game_id + ": " + time.strftime("%H:%M", game.time) + \
+                   " "+ game.away + " at " + game.home
         # add the live list
         li = xbmcgui.ListItem(game_str)
         li.setInfo( type="Video", infoLabels={"Title" : game_str})
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
-                                    url="M3U8 URL HERE",
+                                    url=game_url,
                                     listitem=li,
-                                    isFolder=False)
+                                    isFolder=True)
 
 
 
@@ -52,5 +53,44 @@ def createMainMenu():
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 
+def createStreamMenu(game_id):
+    
+    print "CREATE STREAM MENU\n"
+    
+    my_mls = mlslive.MLSLive()
+    streams = my_mls.getGameStreams(game_id)
+    
+    print "STREAMS\n"
+    
+    if streams == None:
+        dialog = xbmcgui.Dialog()
+        dialog.ok("Error", "No streams yet.")
+        xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
+        return
+    
+    for k in streams.keys():
+        print "BITRATE '" + k + "'\n"
+        li = xbmcgui.ListItem(k)
+        li.setInfo(type="Video", infoLabels={"Title" : k})
+        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                    url=streams[k],
+                                    listitem=li,
+                                    isFolder=False)
+
+    xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
+
+
 if (len(sys.argv[2]) == 0):
     createMainMenu()
+#?id=429877
+else:
+    id_match = re.match('\?id\=(\d*)', sys.argv[2])
+    if id_match != None:
+        try:
+            game_id = id_match.group(1)
+            createStreamMenu(game_id)
+        except:
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Error", "Unable to match ID")
+            xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
+#elif sys.argv[2] == '?id=FINAL':
