@@ -5,8 +5,6 @@ This class provides the helper calls to view the MLS Live streams.
 """
 
 import string, urllib, urllib2, time, xml.dom.minidom
-#import datetime
-#from datetime import datetime
 
 class MLSGame:
     
