@@ -3,6 +3,39 @@ import xbmcplugin, xbmcgui, xbmcaddon, mlslive, urllib, time, re
 __settings__ = xbmcaddon.Addon(id='plugin.video.mlslive')
 __language__ = __settings__.getLocalizedString
 
+team_string = { "CHI" : 30981,
+                "CHV" : 30982,
+                "COL" : 30983,
+                "CLB" : 30984,
+                "DC" : 30985,
+                "DAL" : 30986, 
+                "HOU" : 30987,
+                "KC" : 30988,
+                "LA" : 30989,
+                "MTL" : 30990,
+                "NE" : 30991,
+                "NY" : 30992,
+                "PHI" : 30993,
+                "POR" : 30994,
+                "RSL" : 30995,
+                "SJ" : 30996,
+                "SEA" : 30997,
+                "TOR" : 30998,
+                "VAN" : 30999 }
+
+def getPrettyTitle(game):
+    """
+    Get the pretty title of the game.
+    
+    @param game: The game
+    """
+    pretty = time.strftime("%H:%M", game.time) + " "
+    pretty += __language__(team_string[game.away])
+    pretty += " " + __language__(30008) + " "
+    pretty += __language__(team_string[game.home])
+    
+    return pretty 
+
 
 def createMainMenu():
     """
@@ -37,8 +70,10 @@ def createMainMenu():
 
     for game in my_mls.getGames():
         game_url = sys.argv[0] + "?id=" + urllib.quote_plus(game.game_id)
-        game_str = game.game_id + ": " + time.strftime("%H:%M", game.time) + \
-                   " "+ game.away + " at " + game.home
+        #game_str = game.game_id + ": " + time.strftime("%H:%M", game.time) + \
+        #           " "+ game.away + " at " + game.home
+        game_str = getPrettyTitle(game)
+
         # add the live list
         li = xbmcgui.ListItem(game_str)
         li.setInfo( type="Video", infoLabels={"Title" : game_str})
@@ -54,13 +89,12 @@ def createMainMenu():
 
 
 def createStreamMenu(game_id):
-    
-    print "CREATE STREAM MENU\n"
-    
+    """
+    Create the list of streams (each available bitrate).
+    """
+
     my_mls = mlslive.MLSLive()
     streams = my_mls.getGameStreams(game_id)
-    
-    print "STREAMS\n"
     
     if streams == None:
         dialog = xbmcgui.Dialog()
@@ -68,12 +102,19 @@ def createStreamMenu(game_id):
         xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
         return
     
+    bitrates = []
     for k in streams.keys():
-        print "BITRATE '" + k + "'\n"
-        li = xbmcgui.ListItem(k)
-        li.setInfo(type="Video", infoLabels={"Title" : k})
+        bitrates.append(int(k))
+    bitrates.sort()
+    bitrates.reverse()
+
+    for bitrate in bitrates:
+        stream_id = str(bitrate)
+        title = str(float(bitrate) / float(1000000)) + " Mbps"
+        li = xbmcgui.ListItem(title)
+        li.setInfo( type="Video", infoLabels={"Title" : title})
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
-                                    url=streams[k],
+                                    url=streams[stream_id],
                                     listitem=li,
                                     isFolder=False)
 
@@ -89,8 +130,7 @@ else:
         try:
             game_id = id_match.group(1)
             createStreamMenu(game_id)
-        except:
+        except Exception, e:
             dialog = xbmcgui.Dialog()
             dialog.ok("Error", "Unable to match ID")
             xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
-#elif sys.argv[2] == '?id=FINAL':
