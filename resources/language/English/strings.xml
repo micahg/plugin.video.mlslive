@@ -9,4 +9,25 @@
   <string id="30005">Unable to authenticate with MLS Live</string>
   <string id="30006">Please contact the plugin author</string>
   <string id="30007">Unable to get games list</string>
+  <string id="30008">at</string>
+  
+  <string id="30981">Chicago</string>
+  <string id="30982">Chivas</string>
+  <string id="30983">Colorado</string>
+  <string id="30984">Columbus</string>
+  <string id="30985">D.C.</string>
+  <string id="30986">Dallas</string>
+  <string id="30987">Houston</string>
+  <string id="30988">Kansas City</string>
+  <string id="30989">Los Angeles</string>
+  <string id="30990">Montreal</string>
+  <string id="30991">New England</string>
+  <string id="30992">New York</string>
+  <string id="30993">Philadelphia</string>
+  <string id="30994">Portland</string>
+  <string id="30995">Salt Lake</string>
+  <string id="30996">San Jose</string>
+  <string id="30997">Seattle</string>
+  <string id="30998">Toronto</string>
+  <string id="30999">Vancouver</string>
 </strings>
