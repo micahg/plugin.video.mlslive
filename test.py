@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import mlslive, sys
+import mlslive, sys, time
 
 my_mls = mlslive.MLSLive()
 
@@ -27,5 +27,5 @@ games = my_mls.getGames()
 for game in games:
     
     # Print the game info
-    print game.game_id + ": " + game.time.strftime("%H:%M") + " "+ game.away + \
+    print game.game_id + ": " + time.strftime("%H:%M", game.time) + " "+ game.away + \
           " at " + game.home
