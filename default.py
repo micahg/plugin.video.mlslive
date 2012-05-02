@@ -50,9 +50,19 @@ def getPrettyTitle(game):
     @param game: The game
     """
     pretty = time.strftime("%H:%M", game.time) + " "
-    pretty += __language__(team_string[game.away])
+    
+    # append the pretty name if we know the away team, otherwise, use the abbr
+    if game.away in team_string.keys():
+        pretty += __language__(team_string[game.away])
+    else:
+        pretty += game.away
     pretty += " " + __language__(30008) + " "
-    pretty += __language__(team_string[game.home])
+    
+    # append the pretty name if we know the home team, otherwise, use the abbr
+    if game.home in team_string.keys():
+        pretty += __language__(team_string[game.home])
+    else:
+        pretty += game.home
     
     return pretty 
 
