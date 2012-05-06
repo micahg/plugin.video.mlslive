@@ -43,6 +43,8 @@ team_imgs = { "CHI" : "http://upload.wikimedia.org/wikipedia/en/8/84/Chicago_Fir
               "TOR" : "http://upload.wikimedia.org/wikipedia/en/7/7c/Toronto_FC_Logo.svg",
               "VAN" : "http://upload.wikimedia.org/wikipedia/en/5/5d/Vancouver_Whitecaps_FC_logo.svg" }
 
+GAME_IMAGE_PREFIX = 'http://e2.cdnl3.neulion.com/mls/ced/images/roku/HD/'
+
 def getPrettyTitle(game):
     """
     Get the pretty title of the game.
@@ -105,10 +107,8 @@ def createMainMenu():
         game_str = getPrettyTitle(game)
 
         # add the live list
-        if game.home in team_imgs.keys():
-            li = xbmcgui.ListItem(game_str, iconImage=team_imgs[game.home])
-        else:
-            li = xbmcgui.ListItem(game_str)
+        game_img = GAME_IMAGE_PREFIX + game.away + "_at_" + game.home + ".jpg";
+        li = xbmcgui.ListItem(game_str, iconImage=game_img)
 
         li.setInfo( type="Video", infoLabels={"Title" : game_str})
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
