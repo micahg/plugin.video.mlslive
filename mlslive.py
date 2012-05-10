@@ -199,8 +199,8 @@ class MLSLive:
             idx = string.find(line, "BANDWIDTH=")
             if idx > -1:
                 # handle the description
-                bandwidth = line[idx + 10:len(line)]
-            elif len(line) > 0:
+                bandwidth = line[idx + 10:len(line)].strip()
+            elif len(line) > 0 and len(bandwidth) > 0:
                 # add the playlist
                 streams[bandwidth] = prefix + line
 
