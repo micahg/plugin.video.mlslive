@@ -202,6 +202,6 @@ class MLSLive:
                 bandwidth = line[idx + 10:len(line)].strip()
             elif len(line) > 0 and len(bandwidth) > 0:
                 # add the playlist
-                streams[bandwidth] = prefix + line
+                streams[bandwidth] = (prefix + line).strip()
 
         return streams
