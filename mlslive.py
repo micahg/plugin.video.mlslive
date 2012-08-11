@@ -13,6 +13,7 @@ class MLSGame:
         self.time = game_time
         self.home = home_team
         self.away = away_team
+        self.stream = ""
         
 
 class MLSLive:
@@ -112,13 +113,14 @@ class MLSLive:
             home_abr = game.getElementsByTagName('homeTeam')[0].firstChild.nodeValue
             
             game = MLSGame(game_id, game_date, home_abr, away_abr)
+            game.stream = self.getGameStream(game_id)
             
             games.append(game)
 
         # return the games            
         return games
     
-    def getGameStreams(self, game_id):
+    def getGameStream(self, game_id):
         """
         Get the game streams. This method will parse the game XML for the
         HLS playlist, and then parse that playlist for the different bitrate
@@ -128,6 +130,8 @@ class MLSLive:
         """
         
         game_xml_url = self.GAME_PREFIX + game_id + self.GAME_SUFFIX
+        
+        print game_xml_url
         
         # create the request
         req = urllib2.Request(game_xml_url)
@@ -156,52 +160,10 @@ class MLSLive:
             url = content_node.getAttribute('url')
             break
         
+        return url
+        
         if url == None:
             print "Unable to get m3u8 playlist."
             return None
             
         return self.getStreamsFromPlayList(url)
-
-
-    def getStreamsFromPlayList(self, playlist):
-        """
-        Get the streams from the playlist
-        
-        @param playlist: The playlist URI
-        """
-        # create the request
-        req = urllib2.Request(playlist)
-
-        # request the games        
-        try:
-            resp = urllib2.urlopen(req)
-        except urllib2.URLError, ue:
-            print("URL error trying to open playlist")
-            return None
-        except urllib2.HTTPError, he:
-            print("HTTP error trying to open playlist")
-            return None
-        
-        # store the base URI from the playlist
-        prefix=playlist[0:string.rfind(playlist,'/') + 1]
-        lines = string.split(resp.read(), '\n')
-
-        # parse the playlist file
-        streams = {}
-        bandwidth = ""
-        for line in lines:
-            
-            # skip the first line
-            if line == "#EXTM3U":
-                continue
-            
-            # is this a description or a playlist
-            idx = string.find(line, "BANDWIDTH=")
-            if idx > -1:
-                # handle the description
-                bandwidth = line[idx + 10:len(line)].strip()
-            elif len(line) > 0 and len(bandwidth) > 0:
-                # add the playlist
-                streams[bandwidth] = (prefix + line).strip()
-
-        return streams
