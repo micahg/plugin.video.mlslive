@@ -110,11 +110,6 @@ def createMainMenu():
         li = xbmcgui.ListItem(game_str, iconImage=game_img)
 
         li.setInfo( type="Video", infoLabels={"Title" : game_str})
-        
-        if game.stream == None:
-            print "ERROR: Invalid stream for '" + game_str + "'"
-            continue
-        
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
                                     url=game.stream,
                                     listitem=li,
