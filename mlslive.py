@@ -113,7 +113,11 @@ class MLSLive:
             home_abr = game.getElementsByTagName('homeTeam')[0].firstChild.nodeValue
             
             game = MLSGame(game_id, game_date, home_abr, away_abr)
+            
+            # games streams cannot be none, so use empty string
             game.stream = self.getGameStream(game_id)
+            if game.stream == None:
+                game.stream = ""
             
             games.append(game)
 
@@ -130,7 +134,6 @@ class MLSLive:
         """
         
         game_xml_url = self.GAME_PREFIX + game_id + self.GAME_SUFFIX
-        
         print game_xml_url
         
         # create the request
