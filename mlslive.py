@@ -164,9 +164,3 @@ class MLSLive:
             break
         
         return url
-        
-        if url == None:
-            print "Unable to get m3u8 playlist."
-            return None
-            
-        return self.getStreamsFromPlayList(url)
