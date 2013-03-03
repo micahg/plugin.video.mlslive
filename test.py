@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import mlslive, sys, time
+import mlslive, sys
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -21,10 +21,12 @@ elif options.password == None:
     sys.exit(1)
 
 my_mls = mlslive.MLSLive()
+
+
 if not my_mls.login(options.user, options.password):
     print "Unable to authenticte with MLS live. please set username and password."
     sys.exit(1)
-    
+
 if options.game != None:
     
     # get the streams
@@ -35,10 +37,17 @@ if options.game != None:
      
     sys.exit(0)
 
-games = my_mls.getGames()
+#games = my_mls.getGames()
+games = my_mls.getGames(0)
+teams = my_mls.getTeams()
 
 for game in games:
-    
-    # Print the game info
-    print game.game_id + ": " + time.strftime("%H:%M", game.time) + " "+ game.away + \
-          " at " + game.home
+
+    print game['gameID'] + ": " + my_mls.getGameString(game, "at") 
+    home = my_mls.getTeamAbbr(teams, game['homeTeamID'])
+    vist = my_mls.getTeamAbbr(teams, game['visitorTeamID'])
+    if home != None:
+        print '\t' + home
+    if vist != None:
+        print '\t' + vist 
+
