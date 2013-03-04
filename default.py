@@ -8,7 +8,6 @@ GAME_IMAGE_PREFIX = 'http://e2.cdnl3.neulion.com/mls/ced/images/roku/HD/'
 
 
 def createFinalMenu(my_mls, values_string):
-    print "MICAH '" + values_string + "'"
     values = dict(urlparse.parse_qsl(values_string))
     streams = my_mls.getFinalStreams(values['id'])
     for key in streams.keys():
@@ -22,15 +21,32 @@ def createFinalMenu(my_mls, values_string):
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 
-def createMainMenu(my_mls):
+def createMainMenu(my_mls, values_string):
     """
     Create the main menu consisting of the days games
     """
+    # get the values -- should just be the week offset
+    values = dict(urlparse.parse_qsl(values_string))
 
     # get the teams
     teams = my_mls.getTeams()
+    offset = int(values['week'])
 
-    for game in my_mls.getGames(0):
+    # add next week
+    nli = xbmcgui.ListItem(__language__(30009))
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                url=sys.argv[0] + "?" + urllib.urlencode({'week' : offset + 1}),
+                                listitem=nli,
+                                isFolder=True)
+
+    # add previous week
+    pli = xbmcgui.ListItem(__language__(30010))
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                url=sys.argv[0] + "?" + urllib.urlencode({'week' : offset - 1}),
+                                listitem=pli,
+                                isFolder=True)
+
+    for game in my_mls.getGames(offset):
 
         # get the pretty title        
         game_str = my_mls.getGameString(game, __language__(30008))
@@ -53,6 +69,7 @@ def createMainMenu(my_mls):
         elif my_mls.isGameUpcomming(game):
             li.setInfo( type="Video", infoLabels={"Title" : game_str})
             xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                        url="",
                                         listitem=li,
                                         isFolder=False)
         else:
@@ -106,6 +123,8 @@ my_mls = authenticate()
 if my_mls == None:
     print "ERROR: Unable to authenticate"
 elif (len(sys.argv[2]) == 0):
-    createMainMenu(my_mls)
+    createMainMenu(my_mls, 'week=0')
 elif sys.argv[2][:3] == '?id':
     createFinalMenu(my_mls, sys.argv[2][1:])
+elif sys.argv[2][:5] == '?week':
+    createMainMenu(my_mls, sys.argv[2][1:])

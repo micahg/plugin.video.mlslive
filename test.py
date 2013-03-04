@@ -10,6 +10,8 @@ parser.add_option('-p', '--password', type='string', dest='password',
                   help="Password for authentication")
 parser.add_option("-g", "--game", type='string', dest='game',
                   help="Game to display")
+parser.add_option("-o", "--offset", type='int', dest='offset', default=0,
+                  help="Week offset (from present)")
 
 (options, args) = parser.parse_args()
 
@@ -20,6 +22,7 @@ elif options.password == None:
     print "ERROR: please specify a password (call with -h for help)"
     sys.exit(1)
 
+
 my_mls = mlslive.MLSLive()
 
 
@@ -29,8 +32,8 @@ if not my_mls.login(options.user, options.password):
 
 if options.game != None:
 
-    # get the games again :( (in teh plugin we dont actually do this)
-    games = my_mls.getGames(0)
+    # get the games again :( (in the plugin we don't actually do this)
+    games = my_mls.getGames(options.offset)
     game = None
     for g in games:
         if g['gameID'] == options.game:
@@ -55,17 +58,12 @@ if options.game != None:
 
     sys.exit(0)
 
+print "OFfset = " + str(options.offset)
 #games = my_mls.getGames()
-games = my_mls.getGames(0)
+games = my_mls.getGames(options.offset)
 teams = my_mls.getTeams()
 
 for game in games:
 
     print game['gameID'] + ": " + my_mls.getGameString(game, "at") 
-    home = my_mls.getTeamAbbr(teams, game['homeTeamID'])
-    vist = my_mls.getTeamAbbr(teams, game['visitorTeamID'])
-    if home != None:
-        print '\t' + home
-    if vist != None:
-        print '\t' + vist 
 

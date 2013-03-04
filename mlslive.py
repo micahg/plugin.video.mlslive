@@ -79,7 +79,7 @@ class MLSLive:
         - visitorTeamName (pretty vistor team name)
         """
         today = datetime.date.today()
-        monday = today + datetime.timedelta(days=-today.weekday(), weeks=-week_offset)
+        monday = today + datetime.timedelta(days=-today.weekday(), weeks=week_offset)
         monday_str = monday.strftime("%Y-%m-%d")
         games_url = self.GAMES_PAGE_PREFIX + monday_str + self.GAMES_PAGE_SUFFIX
 
