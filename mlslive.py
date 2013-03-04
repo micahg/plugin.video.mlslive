@@ -138,6 +138,23 @@ class MLSLive:
         return game_dt.strftime("%m/%d %H:%M")
 
 
+    def isGameLive(self, game):
+        if game['gameStatus'][:4] == 'LIVE':
+            return True
+        return False
+
+
+    def isGameUpcomming(self, game):
+        if game['gameStatus'][:8] == 'UPCOMING':
+            return True
+        return False
+
+
+    def adjustArchiveString(self, title, archive_type):
+        new_title = title.split('(')[0]
+        return new_title + '(' + archive_type.title().replace('_', ' ') + ')';
+
+
     def getGameString(self, game, separator):
 
         game_str = game['visitorTeamName'] + " " + separator + " " + \
@@ -151,15 +168,7 @@ class MLSLive:
         return game_str
 
 
-    def getGameStream(self, game_id):
-        """
-        Get the game streams. This method will parse the game XML for the
-        HLS playlist, and then parse that playlist for the different bitrate
-        streams.
-
-        @param game_id: The ID of the game.
-        """
-
+    def getGameXML(self, game_id):
         game_xml_url = self.GAME_PREFIX + game_id + self.GAME_SUFFIX
         self.jar = cookielib.CookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.jar))
@@ -170,6 +179,40 @@ class MLSLive:
             return ""
 
         game_xml = resp.read()
+        return game_xml
+
+
+    def getFinalStreams(self, game_id):
+        game_xml = self.getGameXML(game_id)
+        dom = xml.dom.minidom.parseString(game_xml)
+        rss_node = dom.getElementsByTagName('rss')[0]
+        chan_node = rss_node.getElementsByTagName('channel')[0]
+        games = {}
+        for item in chan_node.getElementsByTagName('item'):
+            # get the game type
+            game_type = item.getElementsByTagName('nl:type')[0].firstChild.nodeValue
+
+            # get the group list and make sure its valid
+            group_list = item.getElementsByTagName('media:group')
+            if group_list == None or len(group_list) == 0:
+                continue
+
+            # get the content node and then the URL
+            content_node = group_list[0].getElementsByTagName('media:content')[0]
+            games[game_type] = content_node.getAttribute('url')
+
+        return games
+
+
+    def getGameLiveStream(self, game_id):
+        """
+        Get the game streams. This method will parse the game XML for the
+        HLS playlist, and then parse that playlist for the different bitrate
+        streams.
+
+        @param game_id: The ID of the game.
+        """
+        game_xml = self.getGameXML(game_id)
 
         dom = xml.dom.minidom.parseString(game_xml)
 

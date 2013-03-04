@@ -28,13 +28,31 @@ if not my_mls.login(options.user, options.password):
     sys.exit(1)
 
 if options.game != None:
-    
+
+    # get the games again :( (in teh plugin we dont actually do this)
+    games = my_mls.getGames(0)
+    game = None
+    for g in games:
+        if g['gameID'] == options.game:
+            game = g
+            break
+
+    if game == None:
+        print "ERROR: Unable to find game"
+        sys.exit(1)
+
     # get the streams
-    stream = my_mls.getGameStream(options.game)
-    
-    # print the stream
-    print stream
-     
+    if my_mls.isGameLive(game):
+        stream = my_mls.getGameLiveStream(options.game)
+        print stream
+    elif not my_mls.isGameUpcomming(game):
+        streams = my_mls.getFinalStreams(options.game)
+        for key in streams.keys():
+            print my_mls.adjustArchiveString(my_mls.getGameString(game, "at"), key)
+            print '\t' + streams[key] + '\n'
+    else:
+        print "Game is still upcoming"
+
     sys.exit(0)
 
 #games = my_mls.getGames()
