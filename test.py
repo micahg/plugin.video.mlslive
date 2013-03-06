@@ -48,7 +48,7 @@ if options.game != None:
     if my_mls.isGameLive(game):
         stream = my_mls.getGameLiveStream(options.game)
         print stream
-    elif not my_mls.isGameUpcomming(game):
+    elif not my_mls.isGameUpcoming(game):
         streams = my_mls.getFinalStreams(options.game)
         for key in streams.keys():
             print my_mls.adjustArchiveString(my_mls.getGameString(game, "at"), key)

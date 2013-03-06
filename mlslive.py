@@ -1,8 +1,19 @@
-"""
+'''
 @author: Micah Galizia <micahgalizia@gmail.com>
 
-This class provides the helper calls to view the MLS Live streams.
-"""
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+'''
 
 import urllib, urllib2, xml.dom.minidom, json, cookielib, time, datetime
 
@@ -62,6 +73,7 @@ class MLSLive:
         
         @param week_offset the number of weeks to offset from the previous
                            monday.
+        @return json game data
 
         The list returned will contain dictionaries, each of which containing
         game details. The details are as follows:
@@ -98,6 +110,10 @@ class MLSLive:
 
 
     def getTeams(self):
+        """
+        Get the list of teams from the web-service
+        @return json team data
+        """
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.jar))
         try:
             resp = opener.open(self.TEAM_PAGE)
@@ -111,6 +127,10 @@ class MLSLive:
 
 
     def getTeamAbbr(self, teams, id):
+        """
+        Get the team abbreviation for a particular ID.
+        @return the team abbreviation
+        """
         for team in teams:
             if str(team['teamID']) == str(id):
                 return team['abbr']
@@ -121,6 +141,7 @@ class MLSLive:
         """
         Convert the date time stamp from GMT to local time
         @param game_date_time the game time (in GMT)
+        @return a string containing the local game date and time.
         """
 
         # We know the GMT offset is 0, so just get rid of the trailing offset
@@ -139,24 +160,46 @@ class MLSLive:
 
 
     def isGameLive(self, game):
+        """
+        Determine if a game is live.
+        @param game the game data dictionary
+        @return true if the game is live, otherwise, false
+        """
         if game['gameStatus'][:4] == 'LIVE':
             return True
         return False
 
 
-    def isGameUpcomming(self, game):
+    def isGameUpcoming(self, game):
+        """
+        Determine if a game is upcoming
+        @return true if the game is still upcoming, otherwise, false
+        """
         if game['gameStatus'][:8] == 'UPCOMING':
             return True
         return False
 
 
     def adjustArchiveString(self, title, archive_type):
+        """
+        For archived games the title needs some adjustment to point out what the
+        archive is (eg: highlights, condensed, full replay)
+        @param title the match title
+        @param archive_type the type of archive.
+        @return the adjusted title
+        """
         new_title = title.split('(')[0]
         return new_title + '(' + archive_type.title().replace('_', ' ') + ')';
 
 
     def getGameString(self, game, separator):
-
+        """
+        Get the game title string
+        @param game the game data dictionary
+        @param separator string containing the word to separate the home and
+                         away side (eg "at")
+        @return the game title
+        """
         game_str = game['visitorTeamName'] + " " + separator + " " + \
                    game['homeTeamName']
 
@@ -169,6 +212,11 @@ class MLSLive:
 
 
     def getGameXML(self, game_id):
+        """
+        Fetch the game XML configuration
+        @param game_id the game id
+        @return a string containing the game XML data
+        """
         game_xml_url = self.GAME_PREFIX + game_id + self.GAME_SUFFIX
         self.jar = cookielib.CookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.jar))
@@ -183,6 +231,12 @@ class MLSLive:
 
 
     def getFinalStreams(self, game_id):
+        """
+        Get the streams for matches that have ended.
+        @param game_id the game id
+        @return a dictionary containing the streams with keys for the stream
+                type
+        """
         game_xml = self.getGameXML(game_id)
         dom = xml.dom.minidom.parseString(game_xml)
         rss_node = dom.getElementsByTagName('rss')[0]
@@ -210,7 +264,8 @@ class MLSLive:
         HLS playlist, and then parse that playlist for the different bitrate
         streams.
 
-        @param game_id: The ID of the game.
+        @param game_id the game id
+        @return the live stream
         """
         game_xml = self.getGameXML(game_id)
 
