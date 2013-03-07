@@ -31,6 +31,11 @@ def createFinalMenu(my_mls, values_string):
     """
     values = dict(urlparse.parse_qsl(values_string))
     streams = my_mls.getFinalStreams(values['id'])
+    
+    if (streams == None):
+        xbmcplugin.endOfDirectory(int(sys.argv[1]))
+        return
+    
     for key in streams.keys():
         title = my_mls.adjustArchiveString(values['title'], key)
         li = xbmcgui.ListItem(title, iconImage=values['image'])

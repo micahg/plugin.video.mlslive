@@ -238,7 +238,11 @@ class MLSLive:
                 type
         """
         game_xml = self.getGameXML(game_id)
-        dom = xml.dom.minidom.parseString(game_xml)
+        try:
+            dom = xml.dom.minidom.parseString(game_xml)
+        except:
+            return None
+
         rss_node = dom.getElementsByTagName('rss')[0]
         chan_node = rss_node.getElementsByTagName('channel')[0]
         games = {}
@@ -269,7 +273,11 @@ class MLSLive:
         """
         game_xml = self.getGameXML(game_id)
 
-        dom = xml.dom.minidom.parseString(game_xml)
+        try:
+            dom = xml.dom.minidom.parseString(game_xml)
+        except:
+            print "Unable to parse game XML for game " + game_id
+            return ""
 
         rss_node = dom.getElementsByTagName('rss')[0]
         chan_node = rss_node.getElementsByTagName('channel')[0]
