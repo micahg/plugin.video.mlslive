@@ -15,7 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 '''
 
-import urllib, urllib2, xml.dom.minidom, json, cookielib, time, datetime
+import urllib, urllib2, xml.dom.minidom, json, cookielib, time, datetime, unicodedata
 
 class MLSLive:
 
@@ -27,12 +27,20 @@ class MLSLive:
         self.LOGIN_PAGE = 'https://live.mlssoccer.com/mlsmdl/secure/login'
         self.GAMES_PAGE_PREFIX = 'http://mobile.cdn.mlssoccer.com/iphone/v5/prod/games_for_week_'
         self.GAMES_PAGE_SUFFIX = '.js'
-        
+
+        # Video channel information 
+        self.CHANNELS_PAGE = 'http://mobile.cdn.mlssoccer.com/iphone/v5/prod/channels.js'
+        self.CHANNEL_PREFIX = 'http://mobile.cdn.mlssoccer.com/iphone/v5/prod/channel_'
+        self.CHANNEL_SUFFIX = '.js'
+
         # Odd, but the year is still 2011 -- I expect this will change in the future
         self.GAME_PREFIX = 'http://mls.cdnak.neulion.com/mobile/feeds/game/2011/'
         self.GAME_SUFFIX = '_ced.xml'
 
         self.TEAM_PAGE = 'http://mobile.cdn.mlssoccer.com/iphone/v5/prod/teams_2013.js'
+
+        # resolution for images
+        self.RES = '560x320'
 
 
     def login(self, username, password):
@@ -323,3 +331,43 @@ class MLSLive:
         stream_url = path_node.firstChild.nodeValue
 
         return stream_url.split('?')[0]
+
+
+    def getVideoChannels(self):
+        """
+        Get the list of video channels
+        """
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.jar))
+        try:
+            resp = opener.open(self.CHANNELS_PAGE)
+        except:
+            print "Unable to load channels list."
+            return None
+
+        json_data = resp.read()
+
+        return json.loads(json_data)['channels']
+
+    def getChannelImage(self, channel):
+        """
+        Get the channel image URL
+        """
+        return channel['tile'].replace('[res]', self.RES)
+
+
+    def getChannelVideos(self, channel_id):
+        """
+        Get the list of videos for the channel
+        """
+        url = self.CHANNEL_PREFIX + channel_id + self.CHANNEL_SUFFIX
+        print url
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.jar))
+        try:
+            resp = opener.open(url)
+        except:
+            print "Unable to load channel video list."
+            return None
+
+        json_data = resp.read()
+
+        return json.loads(json_data)['items']

@@ -23,6 +23,39 @@ __language__ = __settings__.getLocalizedString
 GAME_IMAGE_PREFIX = 'http://e2.cdnl3.neulion.com/mls/ced/images/roku/HD/'
 
 
+def createChannelsMenu(my_mls):
+    channels = my_mls.getVideoChannels()
+    for channel in channels:
+        title = channel['name']
+        li = xbmcgui.ListItem(title, iconImage=my_mls.getChannelImage(channel))
+        li.setInfo( type="Video", infoLabels={"Title" : title})
+        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                    url=sys.argv[0] + "?" + urllib.urlencode({'channel' : channel['channelID']}),
+                                    listitem=li,
+                                    isFolder=True)
+
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+
+def createChannelMenu(my_mls, values_string):
+    """
+    Create the list of videos in the channel
+    """
+    values = dict(urlparse.parse_qsl(values_string))
+    videos = my_mls.getChannelVideos(values['channel'])
+    for video in videos:
+        title = video['title']
+        li = xbmcgui.ListItem(title, iconImage=video['imageUrl'])
+        li.setInfo( type="Video", infoLabels={"Title" : title})
+        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                    url=video['content']['ios'],
+                                    listitem=li,
+                                    isFolder=False)
+
+    # signal the end of the directory
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+
 def createFinalMenu(my_mls, values_string):
     """
     Create a menu for games that have already finished
@@ -31,11 +64,11 @@ def createFinalMenu(my_mls, values_string):
     """
     values = dict(urlparse.parse_qsl(values_string))
     streams = my_mls.getFinalStreams(values['id'])
-    
+
     if (streams == None):
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
         return
-    
+
     for key in streams.keys():
         title = my_mls.adjustArchiveString(values['title'], key)
         li = xbmcgui.ListItem(title, iconImage=values['image'])
@@ -44,6 +77,8 @@ def createFinalMenu(my_mls, values_string):
                                     url=streams[key],
                                     listitem=li,
                                     isFolder=False)
+
+    # signal the end of the directory
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 
@@ -143,6 +178,12 @@ def createMainMenu(my_mls):
                                 listitem=vod,
                                 isFolder=True)
 
+    chan = xbmcgui.ListItem(__language__(30012))
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                url=sys.argv[0] + "?" + urllib.urlencode({'id' : 'channels'}),
+                                listitem=chan,
+                                isFolder=True)
+
     # signal the end of the directory
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
@@ -192,7 +233,12 @@ elif sys.argv[2] == '?id=live':
     createWeekMenu(my_mls, "week=0", False)
 elif sys.argv[2] == '?id=replay':
     createWeeksMenu(my_mls)
+elif sys.argv[2] == '?id=channels':
+    createChannelsMenu(my_mls)
+elif sys.argv[2][:8] == '?channel':
+    createChannelMenu(my_mls, sys.argv[2][1:])
 elif sys.argv[2][:3] == '?id':
     createFinalMenu(my_mls, sys.argv[2][1:])
 elif sys.argv[2][:5] == '?week':
     createWeekMenu(my_mls, sys.argv[2][1:])
+
