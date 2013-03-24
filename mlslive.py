@@ -67,6 +67,35 @@ class MLSLive:
         
         return False
 
+    def getMonday(self, week_offset):
+        today = datetime.date.today()
+        monday = today + datetime.timedelta(days=-today.weekday(), weeks=week_offset)
+        return monday
+
+
+    def getWeeks(self):
+        week_offset = 0
+        week_found = True
+        weeks = {}
+
+        # work backwards through the weeks as long as there are games
+        while week_found:
+            games = self.getGames(week_offset)
+            if len(games) > 0:
+                weeks[week_offset] = self.getMonday(week_offset).strftime("%B %d")
+                week_offset = week_offset - 1
+            else:
+                week_found = False
+
+        # return the weeks
+        return weeks
+
+
+    def getGamesURI(self, week_offset): 
+        monday = self.getMonday(week_offset)
+        monday_str = monday.strftime("%Y-%m-%d")
+        return self.GAMES_PAGE_PREFIX + monday_str + self.GAMES_PAGE_SUFFIX
+
 
     def getGames(self, week_offset):
         """
@@ -91,11 +120,7 @@ class MLSLive:
         - gameStatus ("FINAL","UPCOMING", "LIVE - 50'"
         - visitorTeamName (pretty vistor team name)
         """
-        today = datetime.date.today()
-        monday = today + datetime.timedelta(days=-today.weekday(), weeks=week_offset)
-        monday_str = monday.strftime("%Y-%m-%d")
-        games_url = self.GAMES_PAGE_PREFIX + monday_str + self.GAMES_PAGE_SUFFIX
-
+        games_url = self.getGamesURI(week_offset)
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.jar))
         try:
             resp = opener.open(games_url)

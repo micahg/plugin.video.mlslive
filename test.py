@@ -30,6 +30,9 @@ if not my_mls.login(options.user, options.password):
     print "Unable to authenticte with MLS live. please set username and password."
     sys.exit(1)
 
+weeks = my_mls.getWeeks()
+print weeks
+
 if options.game != None:
 
     # get the games again :( (in the plugin we don't actually do this)
