@@ -82,7 +82,7 @@ class MLSLive:
         while week_found:
             games = self.getGames(week_offset)
             if len(games) > 0:
-                weeks[week_offset] = self.getMonday(week_offset).strftime("%B %d")
+                weeks[week_offset] = self.getMonday(week_offset).strftime("%B %d, %Y")
                 week_offset = week_offset - 1
             else:
                 week_found = False

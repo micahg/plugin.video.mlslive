@@ -131,13 +131,13 @@ def createWeekMenu(my_mls, values_string, final_only=True):
 
 def createMainMenu(my_mls):
     # add the game
-    live = xbmcgui.ListItem('Live Games')
+    live = xbmcgui.ListItem(__language__(30010))
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
                                 url=sys.argv[0] + "?" + urllib.urlencode({'id' : 'live'}),
                                 listitem=live,
                                 isFolder=True)
 
-    vod = xbmcgui.ListItem('Completed Games')
+    vod = xbmcgui.ListItem(__language__(30011))
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
                                 url=sys.argv[0] + "?" + urllib.urlencode({'id' : 'replay'}),
                                 listitem=vod,
