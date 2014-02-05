@@ -123,7 +123,7 @@ class MLSLive:
         time_t = time.strptime(last_day, "%Y-%m-%d")
         last_d = datetime.datetime.fromtimestamp(time.mktime(time_t))
 
-        while date_d < datetime.datetime.today() and date_d < last_d:
+        while date_d < datetime.datetime.today() and date_d <= last_d:
             week_str = self.GAMES_PAGE_PREFIX + date_d.strftime("%Y-%m-%d") + self.GAMES_PAGE_SUFFIX
             weeks[week_str] = date_d.strftime("%B %d, %Y")
             date_d = date_d + datetime.timedelta(weeks=1)
