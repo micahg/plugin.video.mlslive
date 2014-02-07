@@ -56,7 +56,7 @@ class MLSLive:
         # setup the login values        
         values = { 'username' : username,
                    'password' : password }
-        
+
         self.jar = cookielib.CookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.jar))
         try:
@@ -385,7 +385,6 @@ class MLSLive:
         Get the list of videos for the channel
         """
         url = self.CHANNEL_PREFIX + channel_id + self.CHANNEL_SUFFIX
-        print url
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.jar))
         try:
             resp = opener.open(url)
