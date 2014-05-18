@@ -1,4 +1,4 @@
-[B]Version 1.0.8[/B]
+[B]Version 1.0.9[/B]
 
 - don't preload live or upcoming match URIs (should be faster)
 - add error when no stream can be found for live or preloaded matches
