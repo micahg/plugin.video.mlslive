@@ -10,10 +10,8 @@ parser.add_option('-p', '--password', type='string', dest='password',
                   help="Password for authentication")
 parser.add_option('-g', '--game', type='string', dest='game',
                   help="Game to display")
-parser.add_option('-l', '--list-weeks', action='store_true', dest='weeks',
-                  help='List weeks')
-parser.add_option('-w', '--week', type='string', dest='week',
-                  help="List games of the week")
+parser.add_option('-m', '--month', type='string', dest='month',
+                  help="List games of the month")
 parser.add_option('-o', '--offset', type='int', dest='offset', default=0,
                   help="Week offset (from present)")
 parser.add_option('-c', '--channel', type='string', dest='channel',
@@ -31,12 +29,25 @@ elif options.password == None:
 
 my_mls = mlslive.MLSLive()
 
-
 if not my_mls.login(options.user, options.password):
-    print "Unable to authenticte with MLS live. please set username and password."
+    print "*** Unable to authenticte with MLS live. please set username and password."
     sys.exit(1)
+else:
+    print "*** Logon successful"
 
-# my_mls.getGames(values['week']):
+if options.month:
+    # print the months games
+    for game in my_mls.getGames(options.month):
+        print game['gid'] + ') ' + my_mls.getGameString(game, "at")
+
+elif options.game != None:
+    # get the games again :( (in the plugin we don't actually do this)
+    print my_mls.getGameLiveStream(options.game)
+    sys.exit(0)
+
+
+sys.exit(0)
+
 
 if options.weeks:
     weeks = my_mls.getWeeks()

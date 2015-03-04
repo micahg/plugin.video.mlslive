@@ -1,3 +1,7 @@
+[B]Version 1.15.0[/B]
+
+- update for the 2015 API
+
 [B]Version 1.0.10[/B]
 
 - fix game start times
