@@ -42,7 +42,7 @@ def createMonthsMenu():
     """
 
     # add each month in the season
-    for i in range(2,12):
+    for i in range(2,13):
         li = xbmcgui.ListItem(__language__(MONTH_OFFSET + i))
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
                                     url=sys.argv[0] + '?' + urllib.urlencode({'month' : str(i)}),
