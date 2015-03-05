@@ -66,7 +66,6 @@ def createMonthMenu(month):
         return None
 
     for game in games:
-        #print game['gid'] + ') ' + 
         title = mls.getGameString(game, __language__(30008))
         li = xbmcgui.ListItem(title)
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),

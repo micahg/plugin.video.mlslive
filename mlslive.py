@@ -135,7 +135,7 @@ class MLSLive:
         try:
             resp = opener.open(self.GAME_PREFIX, urllib.urlencode(values))
         except:
-            print "Unable get TSN AI"
+            print "Unable get games xml"
             return None
         jar.save(filename=self.getCookieFile(), ignore_discard=True)
 
