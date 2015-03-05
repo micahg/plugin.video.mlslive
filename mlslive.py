@@ -128,7 +128,8 @@ class MLSLive:
 
         values = {'format' : 'xml',
                   'year' : year,
-                  'month' : month }
+                  'month' : month,
+                  'checksubscription' : 'true' }
 
         jar = self.loadCookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(jar))
@@ -174,7 +175,7 @@ class MLSLive:
                 game[str] = game_node.getElementsByTagName(str)[0].firstChild.nodeValue
 
             # see if there is a result in the game
-            result_nodes = result_node = game_node.getElementsByTagName('result')
+            result_nodes = game_node.getElementsByTagName('result')
             if len(result_nodes) > 0:
                 game['result'] = result_nodes[0].firstChild.nodeValue
 
@@ -262,8 +263,12 @@ class MLSLive:
 
         return games
 
+    def getStream(self, adaptive):
 
-    def getGameLiveStream(self, game_id):
+        return None
+
+
+    def getGameLiveStream(self, game_id, condensed = False):
         """
         Get the game streams. This method will parse the game XML for the
         HLS playlist, and then parse that playlist for the different bitrate
@@ -273,20 +278,23 @@ class MLSLive:
         @return the live stream
         """
         values = { 'type' : 'game',
-                   'gt' : 'live',
-                   'id' : game_id }
+                   'gt' : 'condensed' if condensed else 'live',
+                   'id' : game_id,
+                   'nt' : '1'}
 
         uri = self.PUBLISH_POINT + '?' + urllib.urlencode(values)
         jar = self.loadCookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(jar))
 
+        opener.addheaders = [('User-Agent', urllib.quote('PS3Application libhttp/4.5.5-000 (CellOS)'))]
+
         # set the user agent to get the HLS stream
         opener.addheaders = [('User-agent', 'Sony')]
-        try:
-            resp = opener.open(uri)
-        except:
-            print "Unable to get live game XML configuration"
-            return ""
+        #try:
+        resp = opener.open(uri)
+        #except:
+        #    print "Unable to get live game XML configuration"
+        #    return ""
         jar.save(filename=self.getCookieFile(), ignore_discard=True)
         game_xml = resp.read()
 

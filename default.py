@@ -68,11 +68,39 @@ def createMonthMenu(month):
     for game in games:
         title = mls.getGameString(game, __language__(30008))
         li = xbmcgui.ListItem(title)
+        values = {'game' : game['id'],
+                  'title' : title}
+
+        # if the game has a result pass it along
+        if 'result' in game.keys():
+            values['result'] = game['result']
+
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
-                                    url=sys.argv[0] + '?' + urllib.urlencode({'game' : game['gid'],
-                                                                              'title' : title}),
+                                    url=sys.argv[0] + '?' + urllib.urlencode(values),
                                     listitem = li,
                                     isFolder = True)
+
+    # signal the end of the directory
+    xbmcplugin.endOfDirectory(int(sys.argv[1]))
+
+
+def createFinalMenu(game, title):
+
+    # full game replay
+    li = xbmcgui.ListItem(__language__(30011))
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                url=sys.argv[0] + '?' + urllib.urlencode({'game' : game,
+                                                                          'title' : title}),
+                                listitem = li,
+                                isFolder = True)
+
+    #condensed game replay
+    li = xbmcgui.ListItem(__language__(30012))
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                url=sys.argv[0] + '?' + urllib.urlencode({'condensed' : game,
+                                                                          'title' : title}),
+                                listitem = li,
+                                isFolder = True)
 
     # signal the end of the directory
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
@@ -114,6 +142,32 @@ def authenticate():
     return my_mls
 
 
+def playGame(value_string):
+    values = urlparse.parse_qs(value_string)
+    title = values['title'][0]
+    condensed = False
+    if 'condensed' in values.keys():
+        game = values['condensed'][0]
+        condensed = True
+    else:
+        game = values['game'][0]
+
+    if 'result' in values.keys():
+        if values['result'][0] == 'F':
+            createFinalMenu(game, title)
+            return
+
+    mls = mlslive.MLSLive()
+    stream = mls.getGameLiveStream(game, condensed)
+    if stream == '':
+        dialog = xbmcgui.Dialog()
+        dialog.ok(__language__(30015), __language__(30016))
+    else:
+        li = xbmcgui.ListItem(title)
+        li.setInfo( type="Video", infoLabels={"Title" : title})
+        p = xbmc.Player()
+        p.play(stream, li)
+
 
 if len(sys.argv[2]) == 0:
     if not authenticate() == None:
@@ -123,17 +177,7 @@ elif sys.argv[2] == '?id=live':
 elif sys.argv[2][:7] == '?month=':
     values = urlparse.parse_qs(sys.argv[2][1:])
     createMonthMenu(values['month'][0])
+elif sys.argv[2][:10] == "?condensed":
+    playGame(sys.argv[2][1:])
 elif sys.argv[2][:5] == "?game":
-    values = urlparse.parse_qs(sys.argv[2][1:])
-    game = values['game'][0]
-    title = values['title'][0]
-    mls = mlslive.MLSLive()
-    stream = mls.getGameLiveStream(game)
-    if stream == '':
-        dialog = xbmcgui.Dialog()
-        dialog.ok(__language__(30015), __language__(30016))
-    else:
-        li = xbmcgui.ListItem(title)
-        li.setInfo( type="Video", infoLabels={"Title" : title})
-        p = xbmc.Player()
-        p.play(stream, li)
+    playGame(sys.argv[2][1:])
