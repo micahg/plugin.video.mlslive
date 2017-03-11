@@ -299,8 +299,7 @@ class MLSLive:
         streams = {}
         jar = self.createCookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(jar))
-        cookie = 'Authorization={0}'.format(token)
-        opener.addheaders = [('Cookie', cookie),
+        opener.addheaders = [('Authorization', token),
                              ('User-Agent', urllib.quote(self.USER_AGENT))]
         if not xff == None:
             opener.addheaders.append(('X-Forwarded-For', xff))
@@ -330,9 +329,8 @@ class MLSLive:
                 else:
                     print "Unable to parse bandwidth"
             elif line[-5:] == ".m3u8":
-                stream = '{0}{1}|User-Agent={2}&Cookie={3}&{4}'.format(prefix,
-                            line, urllib.quote(self.USER_AGENT), urllib.quote(cookie),
-                            cookie)
+                stream = '{0}{1}|User-Agent={2}&Authorization={3}'.format(prefix,
+                            line, urllib.quote(self.USER_AGENT), token)
                 if not xff == None:
                     stream += '&X-Forwarded-For={0}'.format(urllib.quote(xff))
                 streams[bandwidth] = stream
