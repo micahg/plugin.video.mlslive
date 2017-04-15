@@ -202,6 +202,9 @@ def playGame(values, selected_media = None):
                 return playGame(values, media)
             else:
                 return False
+        elif err == 'media.not-playable':
+            xbmcgui.Dialog().ok(__language__(30016), __language__(30031))
+            return False
 
     if streams == None:
         xbmcgui.Dialog().ok(__language__(30016), __language__(30006))

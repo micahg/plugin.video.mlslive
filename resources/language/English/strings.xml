@@ -34,4 +34,5 @@ Blackouts: {3}</string>
   <string id="30028">Unable to get clubs</string>
   <string id="30029">Logout</string>
   <string id="30030">Access token deleted</string>
+  <string id="30031">Game not started</string>
 </strings>
